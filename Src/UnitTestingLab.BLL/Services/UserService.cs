@@ -1,6 +1,7 @@
 ﻿using UnitTestingLab.DAL;
 using UnitTestingLab.DAL.Entities;
 using System.ComponentModel.DataAnnotations;
+using UnitTestingLab.BLL.Exceptions;
 
 namespace UnitTestingLab.BLL.Services
 {
@@ -33,6 +34,7 @@ namespace UnitTestingLab.BLL.Services
             // 1. Check User Name is not null and empty.
             // 2.1. Check User Email is not null and empty.
             // 2.2. Check User Email format with `new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(user.Email)`
+            VerifyUser(user);
 
             _userRepository.Create(user);
         }
@@ -48,8 +50,27 @@ namespace UnitTestingLab.BLL.Services
             // 1. Check User Name is not null and empty.
             // 2.1. Check User Email is not null and empty.
             // 2.2. Check User Email format with `new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(user.Email)`
+            VerifyUser(user);
 
             _userRepository.Update(id, user);
+        }
+
+        private void VerifyUser(User user)
+        {
+            if (string.IsNullOrEmpty(user.Name))
+            {
+                throw new NameIsRequiredException();
+            }
+
+            if (string.IsNullOrEmpty(user.Email))
+            {
+                throw new EmailIsRequiredException();
+            }
+
+            if (!new EmailAddressAttribute().IsValid(user.Email))
+            {
+                throw new EmailInvalidFormatException();
+            }
         }
     }
 }
